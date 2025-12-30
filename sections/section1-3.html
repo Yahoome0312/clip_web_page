@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.3 The Core Idea - CLIP</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\[', right: '\\]', display: true}
+        ]
+    });"></script>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html" class="active">1. Background</a>
+                <a href="section2-1.html">2. Methodology</a>
+                <a href="section3.html">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>1. Background</h1>
+        
+        <div class="chapter-nav">
+            <a href="section1-1.html">1.1 Supervised Learning</a>
+            <a href="section1-2.html">1.2 Weak Supervision</a>
+            <a href="section1-3.html" class="active-chapter">1.3 CLIP Core Idea</a>
+        </div>
+
+        <section class="content-section">
+            <h2>1.3 The Core Idea of CLIP</h2>
+            <p>
+                CLIP's core insight was simple but profound: Instead of predicting exact words (Generative) or classifying into fixed buckets (Supervised), 
+                it is much easier to simply determine:
+            </p>
+            <h3 style="text-align: center; margin: 2rem 0; font-size: 2.5rem; color: var(--primary-color);">"Match or No Match?"</h3>
+
+            <p>
+                To implement this, CLIP uses two separate neural networks:
+            </p>
+            <ul>
+                <li><strong>Image Encoder:</strong> Processes images into a vector $I_f$.</li>
+                <li><strong>Text Encoder:</strong> Processes text into a vector $T_f$.</li>
+            </ul>
+
+            <div class="visual-container">
+                <div style="display: flex; align-items: center; gap: 2rem; width: 100%; justify-content: center;">
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: #3b82f6; margin: 0 auto; border-radius: 50%;"></div>
+                        <p style="margin-top: 0.5rem;">Image</p>
+                    </div>
+                    <div style="font-size: 2rem;">&rarr;</div>
+                    <div style="padding: 1rem; border: 1px dashed #fff; border-radius: 8px;">
+                        Shared Embedding Space
+                    </div>
+                    <div style="font-size: 2rem;">&larr;</div>
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: #10b981; margin: 0 auto; border-radius: 50%;"></div>
+                        <p style="margin-top: 0.5rem;">Text</p>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                These embeddings are mapped into a <strong>Shared Latent Space</strong>. 
+                If an image and a piece of text are related, their embedding vectors should be close to each other (high cosine similarity). 
+                If unrelated, they should be far apart.
+            </p>
+
+            <p>
+                The key challenge is how to train the model so that this property emerges naturally. CLIP solves this using a 
+                <strong>Contrastive Learning</strong> objective, which we will explore in the next chapter.
+            </p>
+        </section>
+
+        <div class="page-nav">
+            <a href="section1-2.html" class="btn btn-secondary">&larr; Previous</a>
+            <a href="section2-1.html" class="btn">Next: Chapter 2: Methodology &rarr;</a>
+        </div>
+
+    </main>
+</body>
+</html>

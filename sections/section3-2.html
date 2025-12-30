@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3.2 Retrieval - CLIP Applications</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .search-demo {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto 2rem auto;
+        }
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            border-radius: 30px;
+            border: 2px solid #cbd5e1;
+            background: #ffffff;
+            color: #1e293b;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-input:focus { border-color: var(--primary-color); }
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            transition: all 0.5s;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+            opacity: 1;
+            transform: scale(1);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+        .gallery-item.hidden {
+            opacity: 0.1;
+            transform: scale(0.9);
+            filter: grayscale(100%);
+        }
+        .gallery-item.match {
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .similarity-tag {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            font-size: 0.8rem;
+            padding: 4px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        .gallery-item.match .similarity-tag { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html">1. Background</a>
+                <a href="section2-1.html">2. Methodology</a>
+                <a href="section3-1.html" class="active">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>3. Applications: Retrieval</h1>
+        
+        <div class="chapter-nav">
+            <a href="section3-1.html">3.1 Zero-Shot Classification</a>
+            <a href="section3-2.html" class="active-chapter">3.2 Retrieval / Search</a>
+            <a href="section3-3.html">3.3 Generative Guidance</a>
+        </div>
+
+        <section class="content-section">
+            <h2>3.2 Semantic Image Retrieval</h2>
+            <p>
+                In traditional search, searching for "vehicle" might fail if images are only tagged "car" or "truck".
+                CLIP searches by <strong>meaning</strong>.
+            </p>
+            <p>
+                Since text and images live in the same embedding space, we can simply convert your search query into a vector and find the closest image vectors.
+            </p>
+
+            <h3>Live Demo</h3>
+            <p>Try searching for: <strong>"dog"</strong>, <strong>"kitty"</strong>, <strong>"vehicle"</strong>, or <strong>"animal"</strong>.</p>
+            
+            <div class="search-demo">
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Type a query (e.g. 'puppy')..." onkeyup="handleSearch(event)">
+                    <span class="search-icon" onclick="runSearch()">🔍</span>
+                </div>
+
+                <div class="gallery" id="gallery">
+                    <div class="gallery-item" data-tags="dog puppy animal pet">
+                        <img src="../assets/images/dog.jpg" alt="Dog">
+                        <div class="similarity-tag">Match!</div>
+                    </div>
+                    <div class="gallery-item" data-tags="cat kitty kitten animal pet">
+                        <img src="../assets/images/cat.jpg" alt="Cat">
+                        <div class="similarity-tag">Match!</div>
+                    </div>
+                    <div class="gallery-item" data-tags="car vehicle auto transport">
+                        <img src="../assets/images/car.jpg" alt="Car">
+                        <div class="similarity-tag">Match!</div>
+                    </div>
+                </div>
+                <p id="search-feedback" style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem; min-height: 1.2rem;"></p>
+            </div>
+
+            <script>
+                function handleSearch(e) {
+                    if (e.key === 'Enter') runSearch();
+                }
+
+                function runSearch() {
+                    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+                    const items = document.querySelectorAll('.gallery-item');
+                    const feedback = document.getElementById('search-feedback');
+
+                    if (!query) {
+                        items.forEach(item => {
+                            item.classList.remove('hidden', 'match');
+                        });
+                        feedback.textContent = "";
+                        return;
+                    }
+
+                    let matchCount = 0;
+                    items.forEach(item => {
+                        const tags = item.getAttribute('data-tags');
+                        // Simple simulation of semantic overlap
+                        if (tags.includes(query)) {
+                            item.classList.remove('hidden');
+                            item.classList.add('match');
+                            matchCount++;
+                        } else {
+                            item.classList.remove('match');
+                            item.classList.add('hidden');
+                        }
+                    });
+
+                    if (matchCount > 0) {
+                        feedback.textContent = `CLIP found ${matchCount} semantic match(es).`;
+                        feedback.style.color = "#10b981";
+                    } else {
+                        feedback.textContent = "No matches found (Try synonyms like 'auto' or 'pet').";
+                        feedback.style.color = "#ef4444";
+                    }
+                }
+            </script>
+        </section>
+
+        <div class="page-nav">
+            <a href="section3-1.html" class="btn btn-secondary">&larr; Zero-Shot</a>
+            <a href="section3-3.html" class="btn">Next: 3.3 Generative Guidance &rarr;</a>
+        </div>
+
+    </main>
+</body>
+</html>

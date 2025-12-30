@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Methodology - CLIP</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .matrix-cell {
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            background: #334155;
+            position: relative;
+        }
+        .matrix-cell.diagonal {
+            background: var(--secondary-color);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        #cosine-canvas {
+            background: #0f172a;
+            border-radius: 8px;
+            width: 100%;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1.html">1. Background</a>
+                <a href="section2.html" class="active">2. Methodology</a>
+                <a href="section3.html">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>2. Methodology</h1>
+
+        <section class="content-section">
+            <h2>2.1 The Two-Stream Architecture</h2>
+            <p>
+                To compare "apples" (images) and "oranges" (text), CLIP translates both into a common language: <strong>Vectors</strong>.
+            </p>
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
+                <div style="background: #1e293b; padding: 1.5rem; border-radius: 8px; width: 300px;">
+                    <h3 style="text-align: center;">Image Encoder (Fi)</h3>
+                    <p>Compresses high-dimensional pixels into a feature vector. Uses <strong>ResNet-50</strong> or <strong>ViT (Vision Transformer)</strong>.</p>
+                </div>
+                <div style="background: #1e293b; padding: 1.5rem; border-radius: 8px; width: 300px;">
+                    <h3 style="text-align: center;">Text Encoder (Ft)</h3>
+                    <p>Converts text sequences into a feature vector. Uses a <strong>Transformer Decoder</strong> (like GPT-2).</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>2.2 Contrastive Learning: The Matching Game</h2>
+            <p>
+                CLIP doesn't train on one image at a time. It uses a <strong>batch</strong> of N pairs (e.g., 32,768 pairs!).
+            </p>
+            <p>
+                It creates an N x N matrix of possible pairings. The goal is simple:
+            </p>
+            <ul>
+                <li><strong>Maximize</strong> the similarity of the N correct pairs (the diagonal).</li>
+                <li><strong>Minimize</strong> the similarity of the N² - N incorrect pairs (everything else).</li>
+            </ul>
+
+            <div class="visual-container" style="flex-direction: column;">
+                <div class="matrix-grid">
+                    <!-- Row 1 -->
+                    <div class="matrix-cell diagonal"></div><div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
+                    <!-- Row 2 -->
+                    <div class="matrix-cell"></div><div class="matrix-cell diagonal"></div><div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
+                    <!-- Row 3 -->
+                    <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell diagonal"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
+                    <!-- Row 4 -->
+                    <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell diagonal"></div><div class="matrix-cell"></div>
+                    <!-- Row 5 -->
+                    <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell diagonal"></div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Green (Diagonal) = Correct Pairs. Dark = Negative Pairs.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Interactive Concept: Cosine Similarity</h2>
+            <p>How do we measure "closeness"? We use Cosine Similarity. 1 means identical direction, 0 means unrelated (90°), -1 means opposite.</p>
+            
+            <div class="visual-container" style="display: block; background: #1e293b; padding: 0;">
+                <canvas id="cosine-canvas"></canvas>
+                <div style="padding: 1rem; text-align: center;">
+                    <input type="range" id="angle-slider" min="0" max="180" value="45" style="width: 80%;">
+                    <p>Angle: <span id="angle-val">45</span>° | Similarity: <span id="sim-val" style="font-weight: bold; color: var(--primary-color);">0.71</span></p>
+                </div>
+            </div>
+            
+            <script>
+                const canvas = document.getElementById('cosine-canvas');
+                const ctx = canvas.getContext('2d');
+                const slider = document.getElementById('angle-slider');
+                const angleVal = document.getElementById('angle-val');
+                const simVal = document.getElementById('sim-val');
+
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                function draw(angleDeg) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const cx = canvas.width / 2;
+                    const cy = canvas.height - 50;
+                    const len = 120;
+
+                    // Fixed Vector (Image)
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(cx + len, cy);
+                    ctx.strokeStyle = '#3b82f6'; // Primary Blue
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.fillText("Image Vector", cx + len + 10, cy);
+
+                    // Dynamic Vector (Text)
+                    const angleRad = (angleDeg * Math.PI) / 180;
+                    const x2 = cx + len * Math.cos(-angleRad);
+                    const y2 = cy + len * Math.sin(-angleRad);
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = '#10b981'; // Secondary Green
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    ctx.fillStyle = '#10b981';
+                    ctx.fillText("Text Vector", x2, y2 - 10);
+
+                    // Angle Arc
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 40, 0, -angleRad, true);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    // Update Text
+                    const cosSim = Math.cos(angleRad).toFixed(2);
+                    simVal.innerText = cosSim;
+                    angleVal.innerText = angleDeg;
+                }
+
+                slider.addEventListener('input', (e) => draw(e.target.value));
+                draw(45); // Init
+            </script>
+        </section>
+
+        <div class="page-nav">
+            <a href="section1.html" class="btn btn-secondary">&larr; Background</a>
+            <a href="section3.html" class="btn">Next: Applications &rarr;</a>
+        </div>
+
+    </main>
+    
+    <script src="../js/main.js"></script>
+</body>
+</html>

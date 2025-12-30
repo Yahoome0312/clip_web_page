@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3.3 Generative Guidance - CLIP Applications</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .guidance-demo {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        canvas {
+            background: #f8fafc;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            max-width: 100%;
+            border: 1px solid #e2e8f0;
+        }
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html">1. Background</a>
+                <a href="section2-1.html">2. Methodology</a>
+                <a href="section3-1.html">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>3. Applications: Generative AI</h1>
+        
+        <div class="chapter-nav">
+            <a href="section3-1.html">3.1 Zero-Shot Classification</a>
+            <a href="section3-2.html">3.2 Retrieval / Search</a>
+            <a href="section3-3.html" class="active-chapter">3.3 Generative Guidance</a>
+        </div>
+
+        <section class="content-section">
+            <h2>3.3 Guiding Generative Models</h2>
+            <p>
+                Before systems like Stable Diffusion, generating specific images was hard. CLIP changed this by acting as a <strong>Semantic Compass</strong>.
+            </p>
+            <p>
+                A generative model (like a GAN or Diffusion) creates an image. CLIP looks at it and says: 
+                <em>"This looks 10% like 'a cat'. Move the pixels THIS way to make it look more like a cat."</em>
+            </p>
+
+            <h3>Visualizing the "Steering" Process</h3>
+            <p>
+                Imagine the generation process as a path in the high-dimensional space.
+                Click <strong>"Start Generation"</strong> to see CLIP guide a random noise vector toward the target prompt.
+            </p>
+            
+            <div class="guidance-demo">
+                <canvas id="guidanceCanvas" width="500" height="300"></canvas>
+                <div style="margin-top: 1rem; color: #64748b;">Target Prompt: <strong style="color: #10b981;">"A red car"</strong></div>
+                
+                <div class="controls">
+                    <button class="btn" onclick="startGuidance()">Start Generation</button>
+                    <button class="btn btn-secondary" onclick="resetGuidance()">Reset</button>
+                </div>
+            </div>
+
+            <script>
+                const canvas = document.getElementById('guidanceCanvas');
+                const ctx = canvas.getContext('2d');
+                let animationId;
+                let progress = 0;
+                
+                // State
+                const startPos = { x: 50, y: 250 }; // Random Noise
+                const endPos = { x: 450, y: 50 };   // Target Text (Red Car)
+                let currentPos = { ...startPos };
+                
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw Target (Text Embedding)
+                    ctx.beginPath();
+                    ctx.arc(endPos.x, endPos.y, 15, 0, Math.PI * 2);
+                    ctx.fillStyle = '#10b981';
+                    ctx.fill();
+                    ctx.fillStyle = '#1e293b'; // Dark text
+                    ctx.font = '14px Inter';
+                    ctx.fillText("Text: 'Red Car'", endPos.x - 40, endPos.y - 25);
+
+                    // Draw Start (Random Noise)
+                    ctx.beginPath();
+                    ctx.arc(startPos.x, startPos.y, 10, 0, Math.PI * 2);
+                    ctx.fillStyle = '#94a3b8'; // Lighter grey for noise
+                    ctx.fill();
+                    ctx.fillStyle = '#475569'; // Darker text
+                    ctx.fillText("Random Noise", startPos.x, startPos.y + 25);
+
+                    // Draw Path
+                    ctx.beginPath();
+                    ctx.moveTo(startPos.x, startPos.y);
+                    // Bezier curve for organic path
+                    ctx.quadraticCurveTo(200, 250, currentPos.x, currentPos.y);
+                    ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Draw Current Image State
+                    ctx.beginPath();
+                    ctx.arc(currentPos.x, currentPos.y, 20, 0, Math.PI * 2);
+                    // Color shifts from Grey (Noise) to Red (Car)
+                    const r = 148 + (progress * 107); // 148 -> 255
+                    const g = 163 - (progress * 163); // 163 -> 0
+                    const b = 184 - (progress * 184); // 184 -> 0
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Label
+                    ctx.fillStyle = '#1e293b'; // Dark text
+                    ctx.fillText(progress < 1 ? "Generating..." : "Done!", currentPos.x - 30, currentPos.y + 35);
+                }
+
+                function update() {
+                    if (progress < 1) {
+                        progress += 0.01;
+                        // Interpolate position
+                        currentPos.x = startPos.x + (endPos.x - startPos.x) * progress;
+                        currentPos.y = startPos.y + (endPos.y - startPos.y) * progress;
+                        
+                        // Add some "noise" jitter
+                        if (progress < 0.8) {
+                            currentPos.x += (Math.random() - 0.5) * 5;
+                            currentPos.y += (Math.random() - 0.5) * 5;
+                        }
+
+                        draw();
+                        animationId = requestAnimationFrame(update);
+                    } else {
+                        draw();
+                    }
+                }
+
+                function startGuidance() {
+                    cancelAnimationFrame(animationId);
+                    progress = 0;
+                    currentPos = { ...startPos };
+                    update();
+                }
+
+                function resetGuidance() {
+                    cancelAnimationFrame(animationId);
+                    progress = 0;
+                    currentPos = { ...startPos };
+                    draw();
+                }
+
+                // Init
+                draw();
+            </script>
+        </section>
+
+        <div class="page-nav">
+            <a href="section3-2.html" class="btn btn-secondary">&larr; Previous</a>
+            <a href="section4.html" class="btn">Next: 4. Conclusion &rarr;</a>
+        </div>
+
+    </main>
+</body>
+</html>

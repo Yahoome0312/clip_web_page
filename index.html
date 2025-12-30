@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLIP: Connecting Text and Images</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="sections/section1-1.html">1. Background</a>
+                <a href="sections/section2-1.html">2. Methodology</a>
+                <a href="sections/section3-1.html">3. Applications</a>
+                <a href="sections/section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content-section" style="text-align: center; padding: 4rem 2rem;">
+            <h1>CLIP: Connecting Text and Images</h1>
+            <p style="font-size: 1.2rem; color: #64748b; max-width: 800px; margin: 0 auto 2rem;">
+                A comprehensive deep dive into OpenAI's <strong>Contrastive Language-Image Pre-training</strong> model. 
+                Understanding the paradigm shift from fixed-label classification to open-world visual understanding.
+            </p>
+            
+            <div class="visual-container" style="background: transparent; border: none; padding: 0;">
+                <div style="position: relative; width: 100%; max-width: 600px; margin: 0 auto; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <img src="assets/images/ai_abstract.jpg" alt="AI Abstract Art" style="width: 100%; display: block; opacity: 0.9; transition: transform 0.5s ease;">
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); padding: 2rem; color: white;">
+                        <h3 style="margin: 0;">The Bridge Between Vision & Language</h3>
+                    </div>
+                </div>
+            </div>
+
+            <a href="sections/section1-1.html" class="btn" style="font-size: 1.2rem; padding: 1rem 2rem; margin-top: 3rem;">Start Chapter 1: Background &rarr;</a>
+        </section>
+
+        <section class="content-section">
+            <h2>Course Overview</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: var(--primary-color);">1. Background & Motivation</h3>
+                    <p style="color: #64748b;">Analyze the limitations of standard supervised learning and "Ontological Rigidity". Understand why training on ImageNet is not enough.</p>
+                </div>
+                <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: var(--secondary-color);">2. Methodology & Math</h3>
+                    <p style="color: #64748b;">Dive into the Two-Stream Architecture. Detailed mathematical derivation of the <strong>InfoNCE Loss</strong> and Cosine Similarity.</p>
+                </div>
+                <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: var(--accent-color);">3. Zero-Shot & Applications</h3>
+                    <p style="color: #64748b;">Learn how CLIP performs "Zero-Shot" classification and guides generative models like Stable Diffusion.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 CLIP Project. Based on the paper "CLIP: Connecting text and images".</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

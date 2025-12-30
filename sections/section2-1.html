@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.1 Architecture - CLIP Methodology</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\\\[', right: '\\\\]', display: true}
+        ]
+    });"></script>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html">1. Background</a>
+                <a href="section2-1.html" class="active">2. Methodology</a>
+                <a href="section3-1.html">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>2. Methodology: Deep Dive</h1>
+        
+        <div class="chapter-nav">
+            <a href="section2-1.html" class="active-chapter">2.1 Two-Stream Architecture</a>
+            <a href="section2-2.html">2.2 Contrastive Mechanism</a>
+            <a href="section2-3.html">2.3 The Math of Loss</a>
+        </div>
+
+        <section class="content-section">
+            <h2>2.1 The Two-Stream Architecture</h2>
+            <p>
+                The fundamental goal of CLIP is a translation problem: How do we make a computer understand that an "image" made of pixels and a "sentence" made of words are describing the same reality?
+            </p>
+            <p>
+                To achieve this, CLIP employs a <span class="term-highlight">Two-Stream Architecture<span class="term-tooltip">Two independent neural networks that process different data modalities (image and text) in parallel.</span></span>.
+            </p>
+
+            <h3>1. The Encoders</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                <div class="card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--primary-color); padding: 1.5rem; border-radius: 8px;">
+                    <h4 style="color: var(--primary-color);">Image Encoder ($F_I$)</h4>
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <img src="../assets/images/dog.jpg" alt="Input Dog" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #3b82f6;">
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">Input Image: $I$</p>
+                    </div>
+                    <p>
+                        <strong>Role:</strong> Compresses the raw pixels of this dog image into a feature vector $I_f$.
+                    </p>
+                    <p><strong>Architectures Used:</strong></p>
+                    <ul>
+                        <li><strong>ResNet-50:</strong> Extracts hierarchical features (edges &rarr; shapes &rarr; "dog-ness").</li>
+                        <li><strong>ViT:</strong> Splits the image into patches (like puzzle pieces).</li>
+                    </ul>
+                    <p>
+                        $$ F_I(\text{Image}) \rightarrow I_f \in \mathbb{R}^{D_I} $$
+                    </p>
+                </div>
+
+                <div class="card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--secondary-color); padding: 1.5rem; border-radius: 8px;">
+                    <h4 style="color: var(--secondary-color);">Text Encoder ($F_T$)</h4>
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <img src="../assets/images/code_text.jpg" alt="Text Data" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #10b981;">
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">Input Text: $T$</p>
+                    </div>
+                    <p>
+                        <strong>Role:</strong> Converts a text sequence $T$ into a feature vector $T_f$.
+                    </p>
+                    <p><strong>Architecture Used:</strong></p>
+                    <ul>
+                        <li><strong>Transformer Decoder:</strong> Similar to GPT-2 but with <em>masked self-attention</em> removed (allowing it to see the whole sentence at once).</li>
+                    </ul>
+                    <p>
+                        $$ F_T(\text{Text}) \rightarrow T_f \in \mathbb{R}^{D_T} $$
+                    </p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">2. The Projection Head</h3>
+            <p>
+                The image encoder output $I_f$ and text encoder output $T_f$ may have different dimensions. We project them into a 
+                <strong>Shared Multimodal Embedding Space</strong> of dimension $d$.
+            </p>
+            <p>
+                $$ I_e = W_I \cdot I_f \quad \text{and} \quad T_e = W_T \cdot T_f $$
+            </p>
+            <p>
+                Finally, a crucial step is <strong>L2 Normalization</strong>. We force the vectors to have a length of 1.
+            </p>
+            <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0; border: 1px solid #e2e8f0;">
+                $$ \hat{I} = \frac{I_e}{||I_e||} \quad , \quad \hat{T} = \frac{T_e}{||T_e||} $$
+            </div>
+        </section>
+
+        <div class="page-nav">
+            <a href="section1-3.html" class="btn btn-secondary">&larr; Previous Section</a>
+            <a href="section2-2.html" class="btn">Next: 2.2 Contrastive Mechanism &rarr;</a>
+        </div>
+
+    </main>
+</body>
+</html>

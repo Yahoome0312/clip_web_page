@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.2 Contrastive Mechanism - CLIP Methodology</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\[', right: '\]', display: true}
+        ]
+    });"></script>
+    <style>
+        .sim-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px;
+            margin: 2rem 0;
+        }
+        .sim-table th, .sim-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+            border-radius: 8px;
+            position: relative;
+        }
+        /* Headers */
+        .col-header { background: #f1f5f9; color: #475569; font-size: 0.9rem; border: 1px solid #e2e8f0; }
+        .row-header { background: #f1f5f9; font-weight: bold; width: 120px; border: 1px solid #e2e8f0; }
+        
+        /* Matrix Cells */
+        .cell {
+            background: #ffffff;
+            color: #64748b;
+            font-family: monospace;
+            transition: all 0.3s ease;
+            cursor: default;
+            border: 1px solid #e2e8f0;
+        }
+        .cell:hover { transform: scale(1.05); z-index: 10; border: 1px solid var(--primary-color); }
+        
+        /* Highlight Types */
+        .diagonal {
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .off-diagonal {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px dashed #ef4444;
+            color: #ef4444;
+        }
+
+        /* Connecting Lines (Conceptual) */
+        .arrow-down { font-size: 1.5rem; color: #64748b; text-align: center; }
+        
+        .matrix-legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html">1. Background</a>
+                <a href="section2-1.html" class="active">2. Methodology</a>
+                <a href="section3.html">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>2. Methodology: Deep Dive</h1>
+        
+        <div class="chapter-nav">
+            <a href="section2-1.html">2.1 Two-Stream Architecture</a>
+            <a href="section2-2.html" class="active-chapter">2.2 Contrastive Mechanism</a>
+            <a href="section2-3.html">2.3 The Math of Loss</a>
+        </div>
+
+        <section class="content-section">
+            <h2>2.2 The Contrastive Mechanism</h2>
+            <p>
+                Once we have encoded our images and text into vectors, how do we actually "teach" the model?
+                CLIP uses a technique called <strong>Contrastive Learning</strong>.
+            </p>
+            <p>
+                The core idea is to train on a <strong>Batch</strong> of $N$ pairs simultaneously. 
+                Instead of asking "Is this image a dog?", we ask:
+                <em>"Out of all these $N$ captions, which one matches this image best?"</em>
+            </p>
+
+            <h3>The $N 	imes N$ Similarity Matrix</h3>
+            <p>
+                Let's visualize a mini-batch where $N=3$. We calculate the Cosine Similarity for every possible pair.
+            </p>
+
+            <div class="visual-container" style="display: block; background: #f8fafc; padding: 2rem; border: 1px solid #e2e8f0;">
+                
+                <table class="sim-table">
+                    <!-- Text Headers -->
+                    <tr>
+                        <th style="background: transparent;"></th>
+                        <th class="col-header">
+                            <div style="padding: 0.5rem; background: #f1f5f9; border-radius: 6px;">
+                                $T_1$: "A cute puppy"
+                            </div>
+                        </th>
+                        <th class="col-header">
+                            <div style="padding: 0.5rem; background: #f1f5f9; border-radius: 6px;">
+                                $T_2$: "A fresh salad"
+                            </div>
+                        </th>
+                        <th class="col-header">
+                            <div style="padding: 0.5rem; background: #f1f5f9; border-radius: 6px;">
+                                $T_3$: "Rocket launch"
+                            </div>
+                        </th>
+                    </tr>
+
+                    <!-- Row 1: Dog -->
+                    <tr>
+                        <th class="row-header">
+                            <img src="../assets/images/dog.jpg" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+                            <div style="margin-top: 4px; font-size: 0.8rem; color: #3b82f6;">Image $I_1$</div>
+                        </th>
+                        <td class="cell diagonal">
+                            $I_1 \cdot T_1$
+                            <span style="font-size: 1.2rem;">High</span>
+                        </td>
+                        <td class="cell off-diagonal">
+                            $I_1 \cdot T_2$
+                            <span style="font-size: 0.8rem;">Low</span>
+                        </td>
+                        <td class="cell off-diagonal">
+                            $I_1 \cdot T_3$
+                            <span style="font-size: 0.8rem;">Low</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row 2: Salad -->
+                    <tr>
+                        <th class="row-header">
+                            <img src="../assets/images/salad.jpg" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <div style="margin-top: 4px; font-size: 0.8rem; color: #3b82f6;">Image $I_2$</div>
+                        </th>
+                        <td class="cell off-diagonal">
+                            $I_2 \cdot T_1$<br>
+                            <span style="font-size: 0.8rem;">Low</span>
+                        </td>
+                        <td class="cell diagonal">
+                            $I_2 \cdot T_2$<br>
+                            <span style="font-size: 1.2rem;">High</span>
+                        </td>
+                        <td class="cell off-diagonal">
+                            $I_2 \cdot T_3$<br>
+                            <span style="font-size: 0.8rem;">Low</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row 3: Rocket -->
+                    <tr>
+                        <th class="row-header">
+                            <img src="../assets/images/rocket.jpg" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <div style="margin-top: 4px; font-size: 0.8rem; color: #3b82f6;">Image $I_3$</div>
+                        </th>
+                        <td class="cell off-diagonal">
+                            $I_3 \cdot T_1$<br>
+                            <span style="font-size: 0.8rem;">Low</span>
+                        </td>
+                        <td class="cell off-diagonal">
+                            $I_3 \cdot T_2$<br>
+                            <span style="font-size: 0.8rem;">Low</span>
+                        </td>
+                        <td class="cell diagonal">
+                            $I_3 \cdot T_3$<br>
+                            <span style="font-size: 1.2rem;">High</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="matrix-legend">
+                    <div class="legend-item">
+                        <div class="dot" style="background: #10b981;"></div>
+                        <span><strong>Positive Pairs ($N$):</strong> Correct matches (Diagonal) &rarr; Maximize Similarity</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot" style="background: #ef4444;"></div>
+                        <span><strong>Negative Pairs ($N^2 - N$):</strong> Mismatches &rarr; Minimize Similarity</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Why is this powerful?</h3>
+            <p>
+                In a large batch (OpenAI used $N=32,768$), a single image of a dog is contrasted against 32,767 <strong>other</strong> text descriptions.
+            </p>
+            <ul>
+                <li>The model must learn that "A cute puppy" matches the visual features of the dog better than "A fluffy cloud", "A hot dog", or "A wolf".</li>
+                <li>This forces the model to learn <strong>fine-grained semantics</strong>.</li>
+            </ul>
+        </section>
+
+        <div class="page-nav">
+            <a href="section2-1.html" class="btn btn-secondary">&larr; Previous</a>
+            <a href="section2-3.html" class="btn">Next: 2.3 The Math of Loss &rarr;</a>
+        </div>
+
+    </main>
+</body>
+</html>

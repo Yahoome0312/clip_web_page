@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.3 The Math of Loss - CLIP Methodology</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\\\[', right: '\\\\]', display: true}
+        ]
+    });"></script>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html">1. Background</a>
+                <a href="section2-1.html" class="active">2. Methodology</a>
+                <a href="section3-1.html">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>2. Methodology: Deep Dive</h1>
+        
+        <div class="chapter-nav">
+            <a href="section2-1.html">2.1 Two-Stream Architecture</a>
+            <a href="section2-2.html">2.2 Contrastive Mechanism</a>
+            <a href="section2-3.html" class="active-chapter">2.3 The Math of Loss</a>
+        </div>
+
+        <section class="content-section">
+            <h2>2.3 The Mathematical Framework</h2>
+            <p>
+                How do we turn the "Matching Game" into a differentiable loss function? We use a variant of the <span class="term-highlight">InfoNCE Loss<span class="term-tooltip">Noise Contrastive Estimation. A loss function used to learn representations by maximizing mutual information between related signals.</span></span>.
+            </p>
+
+            <h3>Step 1: Cosine Similarity & Logits</h3>
+            <p>
+                First, we compute the similarity between every image $I_i$ and text $T_j$. Since our vectors are normalized (length 1), Cosine Similarity is simply the dot product:
+                $$ \text{sim}(I_i, T_j) = I_i \cdot T_j^T $$
+            </p>
+            <p>
+                However, raw dot products can be small. To help the Softmax function work effectively, we scale these values by a learned temperature parameter $\tau$ (tau).
+                $$ \text{logits}_{i,j} = (I_i \cdot T_j^T) \cdot \exp(\tau) $$
+            </p>
+            <p style="font-size: 0.9rem; color: #94a3b8;">
+                <em>Note: $\tau$ acts as a "confidence" knob. If $\tau$ is high, the distribution becomes sharp (peaked). CLIP learns this parameter automatically.</em>
+            </p>
+
+            <h3>Step 2: Symmetric Loss Calculation</h3>
+            <p>
+                CLIP minimizes two losses simultaneously:
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
+                <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: var(--primary-color);">1. Image-to-Text Loss ($L_{I \to T}$)</h4>
+                    <p>
+                        For each image row $i$, which text $j$ is the correct match? 
+                        We apply Softmax across the <strong>rows</strong>.
+                    </p>
+                    <p style="font-size: 0.9rem;">
+                        $$ p_i = \frac{\exp(\text{logit}_{i,i})}{\sum_{k} \exp(\text{logit}_{i,k})} $$
+                        $$ L_{I \to T} = - \frac{1}{N} \sum_{i=1}^{N} \log(p_i) $$
+                    </p>
+                </div>
+                <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: var(--secondary-color);">2. Text-to-Image Loss ($L_{T \to I}$)</h4>
+                    <p>
+                        For each text column $j$, which image $i$ is the correct match?
+                        We apply Softmax across the <strong>columns</strong>.
+                    </p>
+                    <p style="font-size: 0.9rem;">
+                        $$ p_j = \frac{\exp(\text{logit}_{j,j})}{\sum_{k} \exp(\text{logit}_{k,j})} $$
+                        $$ L_{T \to I} = - \frac{1}{N} \sum_{j=1}^{N} \log(p_j) $$
+                    </p>
+                </div>
+            </div>
+
+            <h3>Step 3: Total Loss</h3>
+            <p>
+                The final objective function is the average of these two losses:
+            </p>
+            <div style="background: #f1f5f9; padding: 1.5rem; border-radius: 8px; text-align: center; border: 1px solid #e2e8f0;">
+                $$ L_{Total} = \frac{1}{2} (L_{I \to T} + L_{T \to I}) $$
+            </div>
+
+            <h3>Summary of the Algorithm</h3>
+            <pre style="background: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #334155; font-size: 0.85rem; border: 1px solid #e2e8f0;">
+# Pseudocode (Numpy-style)
+I_f = image_encoder(images)        # [n, d_i]
+T_f = text_encoder(texts)          # [n, d_t]
+
+# Projection & Normalization
+I_e = l2_normalize(I_f @ W_i)      # [n, d]
+T_e = l2_normalize(T_f @ W_t)      # [n, d]
+
+# Logits
+logits = (I_e @ T_e.T) * np.exp(t) # [n, n]
+
+# Symmetric Loss
+labels = np.arange(n)              # [0, 1, 2, ... n-1]
+loss_i = cross_entropy(logits, labels, axis=0)
+loss_t = cross_entropy(logits, labels, axis=1)
+loss = (loss_i + loss_t) / 2
+            </pre>
+        </section>
+
+        <div class="page-nav">
+            <a href="section2-2.html" class="btn btn-secondary">&larr; Previous</a>
+            <a href="section3-1.html" class="btn">Next: 3. Applications &rarr;</a>
+        </div>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3. Applications - CLIP</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1.html">1. Background</a>
+                <a href="section2.html">2. Methodology</a>
+                <a href="section3.html" class="active">3. Applications</a>
+                <a href="section4.html">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>3. Applications</h1>
+
+        <section class="content-section">
+            <h2>3.1 Zero-Shot Classification</h2>
+            <p>
+                This is CLIP's "magic trick". Traditional models need training for every new category. CLIP does not.
+            </p>
+            <p>
+                To classify an image without training, we turn labels into sentences (prompts):
+                <br>
+                <code>"A photo of a [CLASS]"</code>.
+            </p>
+            <p>
+                If we have an image of a dog, we compute the similarity between the image and:
+            </p>
+            <ul>
+                <li>"A photo of a cat"</li>
+                <li>"A photo of a dog" &larr; <strong>Highest Similarity!</strong></li>
+                <li>"A photo of a car"</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>3.2 Retrieval & Generative Guidance</h2>
+            <p>
+                <strong>Retrieval:</strong> Search your photo album by typing "red car at sunset". CLIP finds the image that matches the text embedding.
+            </p>
+            <p>
+                <strong>Generative AI:</strong> Tools like Stable Diffusion use CLIP as a "compass". The generator creates an image, CLIP checks if it matches the user's prompt, and guides the generator to improve the match.
+            </p>
+        </section>
+
+        <div class="quiz-container">
+            <h3>Knowledge Check</h3>
+            
+            <div style="margin-bottom: 2rem;">
+                <p><strong>1. Does CLIP need to be re-trained to recognize a new object like a "SpaceX Rocket"?</strong></p>
+                <div class="quiz-option" onclick="checkQuiz(this, false, 'q1-feedback')">Yes, it needs labeled data of rockets.</div>
+                <div class="quiz-option" onclick="checkQuiz(this, true, 'q1-feedback')">No, it uses Zero-Shot capabilities.</div>
+                <p id="q1-feedback" style="font-size: 0.9rem; margin-top: 0.5rem;"></p>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <p><strong>2. What is the role of CLIP in Stable Diffusion?</strong></p>
+                <div class="quiz-option" onclick="checkQuiz(this, false, 'q2-feedback')">It generates the pixels.</div>
+                <div class="quiz-option" onclick="checkQuiz(this, true, 'q2-feedback')">It acts as a semantic guide/compass.</div>
+                <p id="q2-feedback" style="font-size: 0.9rem; margin-top: 0.5rem;"></p>
+            </div>
+        </div>
+
+        <div class="page-nav">
+            <a href="section2.html" class="btn btn-secondary">&larr; Methodology</a>
+            <a href="section4.html" class="btn">Next: Conclusion &rarr;</a>
+        </div>
+
+    </main>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

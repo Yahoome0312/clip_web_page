@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4. Limitations & Conclusion - CLIP</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">CLIP</div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="section1-1.html">1. Background</a>
+                <a href="section2-1.html">2. Methodology</a>
+                <a href="section3-1.html">3. Applications</a>
+                <a href="section4.html" class="active">4. Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>4. Limitations & Conclusion</h1>
+
+        <section class="content-section">
+            <h2>4.1 Limitations</h2>
+            <p>Despite its revolutionary capabilities, CLIP is not perfect. It faces several key challenges:</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div class="card" style="background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #ef4444; font-size: 1.2rem;">Fine-Grained Recognition</h3>
+                    <p>It struggles with specific details. E.g., distinguishing a "2016 Ford Mustang" from a "2018 Ford Mustang" or identifying specific flower species.</p>
+                </div>
+                <div class="card" style="background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #f59e0b; font-size: 1.2rem;">Abstract Concepts</h3>
+                    <p>It often fails at counting ("How many apples?") or complex spatial relationships ("Is the cup <em>on</em> or <em>under</em> the table?").</p>
+                </div>
+                <div class="card" style="background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #3b82f6; font-size: 1.2rem;">Prompt Sensitivity</h3>
+                    <p>A slight change in wording (e.g., "A dog" vs. "A photo of a dog") can swing accuracy by over 5%. This necessitates "Prompt Engineering".</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Quiz -->
+        <section class="content-section" style="border: 1px solid var(--primary-color);">
+            <h2>📝 Final Knowledge Check</h2>
+            <div class="quiz-container" style="border: none; background: transparent; padding: 0;">
+                
+                <div style="margin-bottom: 2rem;">
+                    <p><strong>1. What is the core training objective of CLIP?</strong></p>
+                    <div class="quiz-option" onclick="checkQuiz(this, false, 'q1-feedback')">Predicting the exact caption of an image word-by-word (Generative).</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true, 'q1-feedback')">Matching images and text in a shared embedding space (Contrastive).</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false, 'q1-feedback')">Classifying images into 1,000 fixed ImageNet categories.</div>
+                    <p id="q1-feedback" style="font-size: 0.9rem; margin-top: 0.5rem;"></p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <p><strong>2. Why is "Zero-Shot" classification possible with CLIP?</strong></p>
+                    <div class="quiz-option" onclick="checkQuiz(this, false, 'q2-feedback')">Because it was trained on every possible object in the universe.</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true, 'q2-feedback')">Because it understands visual concepts via language, so labels can be arbitrary text.</div>
+                    <p id="q2-feedback" style="font-size: 0.9rem; margin-top: 0.5rem;"></p>
+                </div>
+
+                <div style="margin-bottom: 0;">
+                    <p><strong>3. What is a known limitation of CLIP?</strong></p>
+                    <div class="quiz-option" onclick="checkQuiz(this, true, 'q3-feedback')">It struggles with counting objects (e.g., "3 apples vs 5 apples").</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false, 'q3-feedback')">It cannot recognize cartoons or sketches.</div>
+                    <p id="q3-feedback" style="font-size: 0.9rem; margin-top: 0.5rem;"></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" style="margin-top: 2rem;">
+            <h2>4.2 Conclusion: A Paradigm Shift</h2>
+            <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <p>
+                        CLIP represents a fundamental shift from <strong>Closed-Set Classification</strong> to <strong>Open-World Understanding</strong>.
+                    </p>
+                    <p>
+                        By aligning visual concepts with natural language on a massive scale (400M pairs), it gave computers a way to "understand" images in a way that feels much more human.
+                        It laid the groundwork for the generative AI revolution we see today with tools like DALL-E, Midjourney, and Stable Diffusion.
+                    </p>
+                </div>
+                <div style="flex: 1; min-width: 250px; text-align: center;">
+                    <img src="../assets/images/future_ai.jpg" alt="Future AI" style="width: 100%; max-width: 350px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" style="text-align: center; background: transparent; box-shadow: none; padding-top: 3rem;">
+            <h3>Thank you for learning!</h3>
+            <p>You have completed the CLIP course.</p>
+            <div class="page-nav" style="justify-content: center; gap: 1rem; margin-top: 2rem;">
+                <a href="section3-3.html" class="btn btn-secondary">&larr; Previous</a>
+                <a href="../index.html" class="btn">Return to Home</a>
+            </div>
+        </section>
+
+    </main>
+    <script src="../js/main.js"></script>
+</body>
+</html>
