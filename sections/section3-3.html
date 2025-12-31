@@ -45,7 +45,7 @@
     </header>
 
     <main>
-        <h1>3. Applications: Generative AI</h1>
+        <h1>3. Applications</h1>
         
         <div class="chapter-nav">
             <a href="section3-1.html">3.1 Zero-Shot Classification</a>
@@ -56,125 +56,24 @@
         <section class="content-section">
             <h2>3.3 Guiding Generative Models</h2>
             <p>
-                Before systems like Stable Diffusion, generating specific images was hard. CLIP changed this by acting as a <strong>Semantic Compass</strong>.
+                One of the most surprising impacts of CLIP is that it not only understands images, but can also guide the creation of new ones. Once a model can measure how well an image matches a piece of text, that measurement can be turned into a steering signal for generative systems. This idea—using CLIP as a semantic “compass”—became a cornerstone of early text-to-image generation. 
             </p>
             <p>
-                A generative model (like a GAN or Diffusion) creates an image. CLIP looks at it and says: 
-                <em>"This looks 10% like 'a cat'. Move the pixels THIS way to make it look more like a cat."</em>
+                A generative model such as a GAN or diffusion model can propose an image, feed it into CLIP along with a target prompt, and then adjust its internal representation to make the image more aligned with the text. Even if the generator was never trained on that specific concept, CLIP’s embedding space provides a gradient that nudges the output toward the desired meaning. This simple mechanism enabled some of the earliest open-ended prompt-driven image synthesis systems, long before modern diffusion models became mainstream.
+                
             </p>
 
-            <h3>Visualizing the "Steering" Process</h3>
-            <p>
-                Imagine the generation process as a path in the high-dimensional space.
-                Click <strong>"Start Generation"</strong> to see CLIP guide a random noise vector toward the target prompt.
-            </p>
-            
-            <div class="guidance-demo">
-                <canvas id="guidanceCanvas" width="500" height="300"></canvas>
-                <div style="margin-top: 1rem; color: #64748b;">Target Prompt: <strong style="color: #10b981;">"A red car"</strong></div>
-                
-                <div class="controls">
-                    <button class="btn" onclick="startGuidance()">Start Generation</button>
-                    <button class="btn btn-secondary" onclick="resetGuidance()">Reset</button>
+            <h3>CLIP-Guided Image Generation</h3>
+
+            <div style="background: #ffffff; padding: 2rem; border-radius: 10px; margin: 2rem 0; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <div style="text-align: center;">
+                    <img src="../assets/images/defusion.jpg" alt="CLIP Guiding Image Generation" style="width: 100%; max-width: 800px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <p style="margin-top: 1.5rem; color: #64748b; font-size: 0.95rem; line-height: 1.6; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <strong>CLIP guiding image generation.</strong> 
+                        <br>The red mask indicates the area to be modified. While the "no prompt" baseline fills the region generically, CLIP effectively steers the generative model to create specific objects like a <em>"white ball"</em> or <em>"bowl of water"</em> by optimizing pixels until they mathematically align with the semantic meaning of the text prompt.
+                    </p>
                 </div>
             </div>
-
-            <script>
-                const canvas = document.getElementById('guidanceCanvas');
-                const ctx = canvas.getContext('2d');
-                let animationId;
-                let progress = 0;
-                
-                // State
-                const startPos = { x: 50, y: 250 }; // Random Noise
-                const endPos = { x: 450, y: 50 };   // Target Text (Red Car)
-                let currentPos = { ...startPos };
-                
-                function draw() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                    // Draw Target (Text Embedding)
-                    ctx.beginPath();
-                    ctx.arc(endPos.x, endPos.y, 15, 0, Math.PI * 2);
-                    ctx.fillStyle = '#10b981';
-                    ctx.fill();
-                    ctx.fillStyle = '#1e293b'; // Dark text
-                    ctx.font = '14px Inter';
-                    ctx.fillText("Text: 'Red Car'", endPos.x - 40, endPos.y - 25);
-
-                    // Draw Start (Random Noise)
-                    ctx.beginPath();
-                    ctx.arc(startPos.x, startPos.y, 10, 0, Math.PI * 2);
-                    ctx.fillStyle = '#94a3b8'; // Lighter grey for noise
-                    ctx.fill();
-                    ctx.fillStyle = '#475569'; // Darker text
-                    ctx.fillText("Random Noise", startPos.x, startPos.y + 25);
-
-                    // Draw Path
-                    ctx.beginPath();
-                    ctx.moveTo(startPos.x, startPos.y);
-                    // Bezier curve for organic path
-                    ctx.quadraticCurveTo(200, 250, currentPos.x, currentPos.y);
-                    ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
-                    ctx.setLineDash([5, 5]);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-
-                    // Draw Current Image State
-                    ctx.beginPath();
-                    ctx.arc(currentPos.x, currentPos.y, 20, 0, Math.PI * 2);
-                    // Color shifts from Grey (Noise) to Red (Car)
-                    const r = 148 + (progress * 107); // 148 -> 255
-                    const g = 163 - (progress * 163); // 163 -> 0
-                    const b = 184 - (progress * 184); // 184 -> 0
-                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-                    ctx.fill();
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-
-                    // Label
-                    ctx.fillStyle = '#1e293b'; // Dark text
-                    ctx.fillText(progress < 1 ? "Generating..." : "Done!", currentPos.x - 30, currentPos.y + 35);
-                }
-
-                function update() {
-                    if (progress < 1) {
-                        progress += 0.01;
-                        // Interpolate position
-                        currentPos.x = startPos.x + (endPos.x - startPos.x) * progress;
-                        currentPos.y = startPos.y + (endPos.y - startPos.y) * progress;
-                        
-                        // Add some "noise" jitter
-                        if (progress < 0.8) {
-                            currentPos.x += (Math.random() - 0.5) * 5;
-                            currentPos.y += (Math.random() - 0.5) * 5;
-                        }
-
-                        draw();
-                        animationId = requestAnimationFrame(update);
-                    } else {
-                        draw();
-                    }
-                }
-
-                function startGuidance() {
-                    cancelAnimationFrame(animationId);
-                    progress = 0;
-                    currentPos = { ...startPos };
-                    update();
-                }
-
-                function resetGuidance() {
-                    cancelAnimationFrame(animationId);
-                    progress = 0;
-                    currentPos = { ...startPos };
-                    draw();
-                }
-
-                // Init
-                draw();
-            </script>
         </section>
 
         <div class="page-nav">

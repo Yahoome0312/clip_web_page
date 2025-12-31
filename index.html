@@ -29,37 +29,43 @@
     <main>
         <section class="content-section" style="text-align: center; padding: 4rem 2rem;">
             <h1>CLIP: Connecting Text and Images</h1>
-            <p style="font-size: 1.2rem; color: #64748b; max-width: 800px; margin: 0 auto 2rem;">
-                A comprehensive deep dive into OpenAI's <strong>Contrastive Language-Image Pre-training</strong> model. 
-                Understanding the paradigm shift from fixed-label classification to open-world visual understanding.
+            <p style="font-size: 1.2rem; color: #64748b; max-width: 800px; margin: 0 auto 2rem; text-align: left;">
+        Understanding images and understanding language are two abilities humans take for granted. We effortlessly connect what we see with what we read or hear, forming a unified mental picture of the world.<br>
+        However,for machines, these abilities have historically lived in separate silos. Vision models learned to recognize objects using fixed labels, while language models learned patterns of text without direct grounding in perception.<br>
+        The emergence of <strong>CLIP</strong> broke this deadlock. CLIP stands for <strong>"Contrastive Language-Image Pre-training"</strong>, a revolutionary AI model from OpenAI that fundamentally transforms how machines perceive our world. It represents not merely a model, but a paradigm shift: <strong>CLIP successfully aligned visual concepts with natural language descriptions</strong>.<br>
+        This article provides a simple, intuitive, and comprehensive explanation of what CLIP is, why it works, and why it has had such a broad impact on modern AI systems.
             </p>
             
             <div class="visual-container" style="background: transparent; border: none; padding: 0;">
-                <div style="position: relative; width: 100%; max-width: 600px; margin: 0 auto; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div style="position: relative; width: 120%; max-width: 720px; margin: 0 auto; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                     <img src="assets/images/ai_abstract.jpg" alt="AI Abstract Art" style="width: 100%; display: block; opacity: 0.9; transition: transform 0.5s ease;">
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); padding: 2rem; color: white;">
-                        <h3 style="margin: 0;">The Bridge Between Vision & Language</h3>
+                    <div style="position: absolute; bottom: -35px; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); padding: 2rem; color: white;">
+                        <h3 style="margin: 0;color: #000000">The Bridge Between Vision & Language</h3>
                     </div>
                 </div>
             </div>
 
-            <a href="sections/section1-1.html" class="btn" style="font-size: 1.2rem; padding: 1rem 2rem; margin-top: 3rem;">Start Chapter 1: Background &rarr;</a>
+            <a href="sections/section1-1.html" class="btn" style="font-size: 1.2rem; padding: 1rem 2rem; margin-top: 3rem;">Let's Start Chapter 1: Background &rarr;</a>
         </section>
 
         <section class="content-section">
-            <h2>Course Overview</h2>
+            <h2>Overview</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
                 <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <h3 style="color: var(--primary-color);">1. Background & Motivation</h3>
+                    <h3 style="color: var(--primary-color);">1. Background</h3>
                     <p style="color: #64748b;">Analyze the limitations of standard supervised learning and "Ontological Rigidity". Understand why training on ImageNet is not enough.</p>
                 </div>
                 <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <h3 style="color: var(--secondary-color);">2. Methodology & Math</h3>
+                    <h3 style="color: var(--secondary-color);">2. Methodology</h3>
                     <p style="color: #64748b;">Dive into the Two-Stream Architecture. Detailed mathematical derivation of the <strong>InfoNCE Loss</strong> and Cosine Similarity.</p>
                 </div>
                 <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <h3 style="color: var(--accent-color);">3. Zero-Shot & Applications</h3>
+                    <h3 style="color: var(--accent-color);">3. Applications</h3>
                     <p style="color: #64748b;">Learn how CLIP performs "Zero-Shot" classification and guides generative models like Stable Diffusion.</p>
+                </div>
+                <div class="card" style="padding: 1.5rem; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: var(--third-color);">4. Limitations & Conclusion</h3>
+                    <p style="color: #64748b;">Explore CLIP's challenges and limitations. Understand the paradigm shift from closed-set classification to open-world understanding.</p>
                 </div>
             </div>
         </section>

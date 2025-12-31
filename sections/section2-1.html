@@ -92,17 +92,17 @@
 
             <h3 style="margin-top: 2rem;">2. The Projection Head</h3>
             <p>
-                The image encoder output $I_f$ and text encoder output $T_f$ may have different dimensions. We project them into a 
+                The image encoder output $I_f$ and text encoder output $T_f$ may have different dimensions. We project them into a
                 <strong>Shared Multimodal Embedding Space</strong> of dimension $d$.
             </p>
             <p>
-                $$ I_e = W_I \cdot I_f \quad \text{and} \quad T_e = W_T \cdot T_f $$
+                $$ \hat{I} = W_I \cdot I_f \quad \text{and} \quad \hat{T} = W_T \cdot T_f $$
             </p>
             <p>
                 Finally, a crucial step is <strong>L2 Normalization</strong>. We force the vectors to have a length of 1.
             </p>
             <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0; border: 1px solid #e2e8f0;">
-                $$ \hat{I} = \frac{I_e}{||I_e||} \quad , \quad \hat{T} = \frac{T_e}{||T_e||} $$
+                $$ I_e = \frac{\hat{I}}{||\hat{I}||} \quad , \quad T_e = \frac{\hat{T}}{||\hat{T}||} $$
             </div>
         </section>
 

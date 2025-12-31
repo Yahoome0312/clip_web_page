@@ -44,49 +44,51 @@
         <section class="content-section">
             <h2>1.2 Weak Supervision and the Generative Trap</h2>
             <p>
-                Researchers have long realized that manually labeling datasets is unscalable. 
-                However, the internet is full of <strong>natural signals</strong>: HTML alt text, social media captions, and news descriptions.
-                Leveraging this data is known as <span class="term-highlight">Natural Language Supervision<span class="term-tooltip">Training models on pairs of images and text found naturally on the web.</span></span>.
+                At the same time, researchers have long realized that the internet is full of <strong>natural signals</strong>: HTML alt text, social media captions, and news image descriptions.
+                This is known as <span class="term-highlight">Natural Language Supervision<span class="term-tooltip">Training models on pairs of images and text found naturally on the web.</span></span>.
+            </p>
+
+            <p>
+                Prior to CLIP, works like <strong>VirTex</strong> and <strong>ICMLM</strong> attempted to leverage this data. They typically employed a <strong>Generative Objective</strong>: training a model to look at an image and predict the corresponding text caption (Image Captioning). While appealing in principle, this strategy has several drawbacks:
             </p>
 
             <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; border-left: 4px solid var(--secondary-color); border: 1px solid #e2e8f0; border-left-width: 4px;">
-                <h3>The "Old Way": Generative Objectives (VirTex, ICMLM)</h3>
+                <h3>The Generative Way</h3>
                 <p>
-                    Prior models tried to <strong>generate</strong> the text caption from the image pixel-by-pixel.
+                    These models tried to <strong>generate</strong> the text caption from the image pixel-by-pixel.
                 </p>
-                <div style="font-family: monospace; background: #f1f5f9; padding: 1rem; border-radius: 6px; margin-top: 1rem; color: #334155; border: 1px solid #cbd5e1;">
+                <div style="background: #f1f5f9; padding: 1rem; border-radius: 6px; margin-top: 1rem; color: #334155; border: 1px solid #cbd5e1;">
                     Input: [Image] &rarr; Prediction: "A" &rarr; "cute" &rarr; "puppy" ...
                 </div>
             </div>
 
-            <h3>The Flaw: High Entropy & The Generative Trap</h3>
+            <h3 style="color: var(--accent-color);">Image Descriptions are High-Entropy</h3>
             <p>
-                While appealing, this strategy fails because image descriptions have <strong>High Entropy</strong> (high uncertainty).
+                A single photograph can have countless correct descriptions. This makes the learning problem extremely difficult, as the model is penalized for producing reasonable descriptions that do not exactly match the reference text.
             </p>
 
-            <div style="display: flex; gap: 2rem; align-items: flex-start; margin-top: 2rem; flex-wrap: wrap;">
+            <div style="display: flex; gap: 2rem; align-items: center; margin-top: 2rem; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 250px; text-align: center;">
                     <img src="../assets/images/dog.jpg" alt="A dog" style="width: 100%; max-width: 300px; border-radius: 8px; border: 2px solid #e2e8f0;">
                     <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">One Image, Infinite Captions</p>
                 </div>
-                
+
                 <div style="flex: 1; min-width: 300px;">
                     <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
-                        <h4 style="color: #ef4444; margin-bottom: 1rem;">Why is predicting text hard?</h4>
-                        <p>A single image can be correctly described in many ways. If the model predicts one valid caption but the dataset has another, it gets penalized.</p>
-                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
-                            <li style="padding: 0.5rem; border-bottom: 1px solid #f1f5f9; color: #10b981;">✔ "A cute puppy"</li>
-                            <li style="padding: 0.5rem; border-bottom: 1px solid #f1f5f9; color: #10b981;">✔ "My pet Fido"</li>
-                            <li style="padding: 0.5rem; border-bottom: 1px solid #f1f5f9; color: #10b981;">✔ "An animal on the grass"</li>
+                        <h4 style="color: #ef4444; margin-bottom: 1rem;">All Equally Valid Descriptions:</h4>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="padding: 0.75rem; border-bottom: 1px solid #f1f5f9; color: #10b981; font-size: 1rem;">✔ "A cute puppy"</li>
+                            <li style="padding: 0.75rem; border-bottom: 1px solid #f1f5f9; color: #10b981; font-size: 1rem;">✔ "My pet Fido"</li>
+                            <li style="padding: 0.75rem; color: #10b981; font-size: 1rem;">✔ "An animal on the grass"</li>
                         </ul>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: #64748b; font-style: italic;">The model gets penalized if its valid caption doesn't match the reference.</p>
                     </div>
                 </div>
             </div>
-            
-            <h3 style="margin-top: 2rem;">Computational Inefficiency</h3>
+
+            <h3 style="margin-top: 2rem; color: var(--accent-color);">Difficulties in Resource Allocation</h3>
             <p>
-                Forcing a model to predict every single word wastes computation on non-visual words like "a", "the", "is". 
-                <strong>CLIP's insight:</strong> We don't need to generate the text. We just need to understand if it matches.
+                Forcing a model to predict these diverse descriptions word-for-word is extremely difficult and computationally inefficient. The model wastes vast amounts of compute learning to predict insignificant words like "a" or "the," rather than focusing on visual semantics.
             </p>
         </section>
 

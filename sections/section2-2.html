@@ -101,16 +101,54 @@
             <p>
                 Once we have encoded our images and text into vectors, how do we actually "teach" the model?
                 CLIP uses a technique called <strong>Contrastive Learning</strong>.
+                <br>Imagine an ideal scenario. We have <em>a photo of a dog</em> and <em>the text "it is a dog"</em>. When these inputs pass through their respective encoders, they become series of numbers. We expect that the numerical sequence in this text should be very close to, or even identical to, the numerical sequence in this image.
+            </p>
+
+
+            <h3 style="color: var(--secondary-color);">1. The Ruler: Cosine Similarity</h3>
+            <p>
+                How do we quantify if two series of numbers are "close"? We use a convenient tool: <strong>Cosine Similarity</strong>.
             </p>
             <p>
-                The core idea is to train on a <strong>Batch</strong> of $N$ pairs simultaneously. 
+                Given two attribute vectors $A$ and $B$ (which correspond to image vector and text vector in CLIP), their cosine similarity $\theta$ is given by the dot product and vector lengths. The formula is as follows:
+            </p>
+
+            <div style="background: #f1f5f9; padding: 1.5rem; border-radius: 8px; text-align: center; margin: 1.5rem 0; border: 1px solid #e2e8f0;">
+                $$\mathrm{similarity}=\cos{\left(\theta\right)}=\frac{A\cdot B}{|A||B|}=\frac{\sum_{i=1}^{n}A_i\times B_i}{\sqrt{\sum_{i=1}^{n}\left(A_i\right)^2}\times\sqrt{\sum_{i=1}^{n}\left(B_i\right)^2}}$$
+            </div>
+
+            <p style="font-size: 0.95rem; color: var(--text-color);">
+                Here, $A_i$, $B_i$ represent the individual components of vectors $A$ and $B$.
+            </p>
+
+            <div style="display: flex; gap: 2rem; align-items: center; margin: 2rem 0; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <img src="../assets/images/cosine.png" alt="Cosine Similarity Illustration" style="width: 100%; max-width: 400px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid var(--border-color);">
+                </div>
+                <div style="flex: 1; min-width: 300px;">
+                    <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <h4 style="color: var(--primary-color); margin-bottom: 1rem;">Similarity Range:</h4>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><strong>+1:</strong> Vectors point in exactly the same direction</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><strong>0:</strong> Vectors are orthogonal</li>
+                            <li style="padding: 0.5rem 0;"><strong>-1:</strong> Vectors point in exactly opposite directions</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: #64748b; font-style: italic;">
+                            Values in between represent varying degrees of similarity or dissimilarity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                The core idea is to train on a <strong>Batch</strong> of $N$ pairs simultaneously.
                 Instead of asking "Is this image a dog?", we ask:
                 <em>"Out of all these $N$ captions, which one matches this image best?"</em>
             </p>
 
-            <h3>The $N 	imes N$ Similarity Matrix</h3>
+            <h3>2. The $N \times N$ Similarity Matrix</h3>
             <p>
-                Let's visualize a mini-batch where $N=3$. We calculate the Cosine Similarity for every possible pair.
+                Let's visualize a mini-batch where $N=3$, which gives us a matrix of size $3 \times 3$. We calculate the Cosine Similarity for every possible pair.
             </p>
 
             <div class="visual-container" style="display: block; background: #f8fafc; padding: 2rem; border: 1px solid #e2e8f0;">
@@ -144,15 +182,12 @@
                         </th>
                         <td class="cell diagonal">
                             $I_1 \cdot T_1$
-                            <span style="font-size: 1.2rem;">High</span>
                         </td>
                         <td class="cell off-diagonal">
                             $I_1 \cdot T_2$
-                            <span style="font-size: 0.8rem;">Low</span>
                         </td>
                         <td class="cell off-diagonal">
                             $I_1 \cdot T_3$
-                            <span style="font-size: 0.8rem;">Low</span>
                         </td>
                     </tr>
 
@@ -163,16 +198,13 @@
                             <div style="margin-top: 4px; font-size: 0.8rem; color: #3b82f6;">Image $I_2$</div>
                         </th>
                         <td class="cell off-diagonal">
-                            $I_2 \cdot T_1$<br>
-                            <span style="font-size: 0.8rem;">Low</span>
+                            $I_2 \cdot T_1$
                         </td>
                         <td class="cell diagonal">
-                            $I_2 \cdot T_2$<br>
-                            <span style="font-size: 1.2rem;">High</span>
+                            $I_2 \cdot T_2$
                         </td>
                         <td class="cell off-diagonal">
-                            $I_2 \cdot T_3$<br>
-                            <span style="font-size: 0.8rem;">Low</span>
+                            $I_2 \cdot T_3$
                         </td>
                     </tr>
 
@@ -183,16 +215,13 @@
                             <div style="margin-top: 4px; font-size: 0.8rem; color: #3b82f6;">Image $I_3$</div>
                         </th>
                         <td class="cell off-diagonal">
-                            $I_3 \cdot T_1$<br>
-                            <span style="font-size: 0.8rem;">Low</span>
+                            $I_3 \cdot T_1$
                         </td>
                         <td class="cell off-diagonal">
-                            $I_3 \cdot T_2$<br>
-                            <span style="font-size: 0.8rem;">Low</span>
+                            $I_3 \cdot T_2$
                         </td>
                         <td class="cell diagonal">
-                            $I_3 \cdot T_3$<br>
-                            <span style="font-size: 1.2rem;">High</span>
+                            $I_3 \cdot T_3$
                         </td>
                     </tr>
                 </table>
@@ -211,12 +240,9 @@
 
             <h3>Why is this powerful?</h3>
             <p>
-                In a large batch (OpenAI used $N=32,768$), a single image of a dog is contrasted against 32,767 <strong>other</strong> text descriptions.
+                CLIP uses 32768 image-text pairs every single batch, which is a pretty big batch size compared to a more traditional approach which might see a batch size of 16~64. As a result, CLIP is forced to be really good at getting positive pairs far away from a large number of negative pairs.
             </p>
-            <ul>
-                <li>The model must learn that "A cute puppy" matches the visual features of the dog better than "A fluffy cloud", "A hot dog", or "A wolf".</li>
-                <li>This forces the model to learn <strong>fine-grained semantics</strong>.</li>
-            </ul>
+            
         </section>
 
         <div class="page-nav">

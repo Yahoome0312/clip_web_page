@@ -97,7 +97,7 @@
     </header>
 
     <main>
-        <h1>3. Applications: Zero-Shot</h1>
+        <h1>3. Applications</h1>
         
         <div class="chapter-nav">
             <a href="section3-1.html" class="active-chapter">3.1 Zero-Shot Classification</a>
@@ -108,16 +108,23 @@
         <section class="content-section">
             <h2>3.1 Zero-Shot Classification</h2>
             <p>
-                This is CLIP's "magic trick". Traditional models need training for every new category. CLIP does not.
+                Zero-shot classification is one of the most intuitive and influential applications of CLIP, directly addressing a central limitation of traditional supervised learning: the need for labeled training data for every new task.
+                CLIP does not.
                 It can classify images into categories it has <strong>never seen before</strong> during training.
             </p>
 
             <h3>How it works</h3>
-            <ol>
-                <li><strong>Prompt Engineering:</strong> We turn labels into sentences: "cat" &rarr; "A photo of a cat".</li>
-                <li><strong>Encoding:</strong> We encode the image and all candidate text sentences.</li>
-                <li><strong>Comparison:</strong> We calculate Cosine Similarity. The sentence with the highest score wins.</li>
-            </ol>
+            <p>
+                The procedure is straightforward. To classify an image into categories such as <em>cat</em>, <em>dog</em>, or <em>car</em>, each category is first expressed as a natural language prompt, for example:
+            </p>
+            <ul style="margin-left: 30px;">
+                <li><em>"a photo of a cat"</em></li>
+                <li><em>"a photo of a dog"</em></li>
+                <li><em>"a photo of a car"</em></li>
+            </ul>
+            <p>
+                These prompts are encoded using CLIP's text encoder, while the image is encoded using the image encoder. The predicted class is simply the text prompt whose embedding has the <strong>highest cosine similarity</strong> with the image embedding.
+            </p>
 
             <h3 style="margin-top: 2rem;">Interactive Simulator</h3>
             <p>Click "Run Classification" to see how CLIP scores these prompts against the image.</p>
@@ -191,6 +198,27 @@
                     }, 100);
                 }
             </script>
+
+            <h3 style="color: var(--secondary-color); margin-top: 3rem;">CLIP vs Traditional Classifiers</h3>
+            <p>
+                The key difference between CLIP and traditional classifiers lies in their representation. In a standard image classifier, prediction is performed by a fixed classification head trained to output one of a predefined set of labels. CLIP removes this classification head entirely. Instead, classification is reformulated as a <strong>similarity comparison in a shared embedding space</strong>.
+            </p>
+
+            <div style="background: #ffffff; padding: 2rem; border-radius: 10px; margin: 2rem 0; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="text-align: center; color: var(--text-color); margin-bottom: 1.5rem;">Example: Classifying a Banana</h4>
+
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <img src="../assets/images/banana.jpg" alt="Banana" style="width: 150%; max-width: 450px; border-radius: 8px; border: 2px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <p style="margin-top: 0.5rem; color: #64748b; font-size: 0.9rem;">While a traditional ResNet trained on ImageNet performs well on standard photos of bananas, its understanding collapses when faced with sketches, cartoons, or unusual viewpoints. <br>In contrast, CLIP maintains consistent performance across these distinct visual styles. This demonstrates that CLIP has moved beyond memorizing pixel patterns to understanding the abstract, semantic concept of a "banana," making it far more robust to real-world variations.</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--secondary-color); margin-top: 2rem;">Why This Is Powerful</h3>
+            <p>
+                Crucially, zero-shot classification is not a special inference trick for CLIP—it is its native operating mode. During training, CLIP never learned dataset-specific classification heads. It learned to align images with natural language descriptions. Zero-shot inference simply applies this learned alignment to new tasks.
+                <br>
+                <br>In this sense, CLIP does not ask, “Which label does this image belong to?” but rather, “Which description best explains this image?” This shift from labels to language is what gives CLIP its flexibility and strong generalization ability.
+            </p>
         </section>
 
         <div class="page-nav">

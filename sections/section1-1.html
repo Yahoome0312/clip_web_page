@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1.1 Standard Supervised Learning - CLIP</title>
+    <title>1.1 Rigid Standard Supervised Learning - CLIP</title>
     <link rel="stylesheet" href="../assets/styles/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -44,10 +44,10 @@
         <section class="content-section">
             <h2>1.1 Standard Supervised Learning</h2>
             <p>
-                For nearly a decade, progress in computer vision was driven by a single dominant paradigm: <strong>Standard Supervised Learning</strong>. 
+                Before Clip, progress in computer vision was driven by a single dominant paradigm: <strong>Standard Supervised Learning</strong>. 
                 Models like ResNet, VGG, and AlexNet were trained to answer one specific question:
             </p>
-            <blockquote style="border-left: 4px solid var(--primary-color); padding-left: 1rem; margin: 1.5rem 0; font-style: italic; color: #cbd5e1;">
+            <blockquote style="border-left: 4px solid var(--primary-color); padding-left: 1rem; margin: 1.5rem 0; font-style: italic; color: #475569;">
                 "Which of these $N$ predefined categories does this image belong to?"
             </blockquote>
             
@@ -68,9 +68,7 @@
                     
                     <!-- Input -->
                     <div style="text-align: center;">
-                        <div style="width: 80px; height: 80px; background: #ffffff; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #1e293b; font-weight: bold;">
-                            Input<br>Image
-                        </div>
+                        <img src="../assets/images/dog.jpg" alt="Dog" style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #cbd5e1; border-radius: 8px;">
                     </div>
 
                     <div style="font-size: 2rem; color: #94a3b8;">&rarr;</div>
@@ -92,8 +90,10 @@
                         <div style="color: #64748b;">Class 1000: Toilet Tissue</div>
                     </div>
                 </div>
-                <p class="placeholder-text" style="font-size: 0.9rem; margin-top: 1rem; color: #ef4444;">
-                    What if we show it a "Pikachu"? &rarr; It forces a prediction into one of the 1,000 existing classes (e.g., "Yellow Balloon"), which is wrong.
+                <p class="placeholder-text" style="font-size: 0.9rem; margin-top: -0.6rem; margin-bottom: -0.6rem; color: #ef4444; text-align: center;">
+                    What if we show it a "Pikachu"? <br>
+                    It forces a prediction into one of the 1,000 existing classes (e.g., "Yellow Balloon")<br>
+                    Obiviously, it is wrong.
                 </p>
             </div>
 
@@ -104,22 +104,28 @@
                 <div class="card" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
                     <h4 style="color: var(--accent-color);">1. Fixed Vocabulary</h4>
                     <p style="font-size: 0.95rem;">
-                        The model can only recognize concepts it was explicitly taught. It cannot recognize "COVID-19 Face Masks" or a "Tesla Cybertruck" because these concepts didn't exist in the ImageNet dataset (created ~2012).
+                        The model can only recognize concepts it was explicitly taught. <br>
+                         If a model is trained on ImageNet, it cannot recognize "Pikachu," "COVID-19 Face Masks," or a "Tesla Cybertruck," because these categories simply do not exist in the indices.
                     </p>
                 </div>
                 <div class="card" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
                     <h4 style="color: var(--accent-color);">2. Loss of Semantics</h4>
                     <p style="font-size: 0.95rem;">
-                        To the model, Class #10 (Dalmatian) and Class #15 (German Shepherd) are just orthogonal indices in a One-Hot vector:
-                        $$ [0, ..., 1, ..., 0] $$
-                        The mathematical distance between two dog breeds is the same as the distance between a "Dog" and a "Taxicab". The model loses the semantic hierarchy that exists in the real world.
+                        To the model, Class <em>Dalmatian</em> (label 10) and Class <em>German Shepherd</em> (label 15) are just orthogonal indices in a One-Hot vector: $[0, ..., 1, ..., 0]$.
+                        <br>The mathematical distance between <em>these two dog breeds</em> is the same as the distance between a <em>"Dog"</em> and a <em>"Taxicab"</em>, which loses the semantic hierarchy that exists in the real world.
                     </p>
                 </div>
             </div>
 
-            <p style="margin-top: 2rem;">
-                This rigidity is not a bug—it is a direct consequence of the <strong>classification objective</strong>. To fix this, we need a way to learn from data that evolves naturally, without predefined labels.
-            </p>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-left: 4px solid var(--primary-color); border-radius: 8px;">
+                <h4 style="color: var(--primary-color); margin-bottom: 0.75rem; font-size: 1.1rem;">This rigidity is <strong>not a bug</strong></h4>
+                <p style="margin-bottom: 0.5rem; font-size: 1rem;">
+                    <I>It is a direct consequence of the <strong>classification objective</strong>.
+                </p>
+                <p style="font-size: 0.95rem; color: #475569; margin: 0;">
+                    💡 To fix this, we need a way to learn from data that evolves naturally, without predefined labels.
+                </p>
+            </div>
         </section>
 
         <div class="page-nav">

@@ -52,26 +52,51 @@
             <p>
                 To implement this, CLIP uses two separate neural networks:
             </p>
-            <ul>
+            <ul style="margin-left: 30px;">
                 <li><strong>Image Encoder:</strong> Processes images into a vector $I_f$.</li>
                 <li><strong>Text Encoder:</strong> Processes text into a vector $T_f$.</li>
             </ul>
 
-            <div class="visual-container">
-                <div style="display: flex; align-items: center; gap: 2rem; width: 100%; justify-content: center;">
-                    <div style="text-align: center;">
-                        <div style="width: 60px; height: 60px; background: #3b82f6; margin: 0 auto; border-radius: 50%;"></div>
-                        <p style="margin-top: 0.5rem;">Image</p>
+            <div class="visual-container" style="background: var(--bg-color); padding: 2.5rem 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; width: 100%; justify-content: center; flex-wrap: wrap;">
+
+                    <!-- Image -->
+                    <div style="width: 85px; height: 85px;">
+                        <img src="../assets/images/dog.jpg" alt="Dog" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 2px solid var(--border-color);">
                     </div>
-                    <div style="font-size: 2rem;">&rarr;</div>
-                    <div style="padding: 1rem; border: 1px dashed #fff; border-radius: 8px;">
-                        Shared Embedding Space
+
+                    <!-- Arrow -->
+                    <div style="font-size: 2rem; color: var(--accent-color); display: flex; align-items: center;">→</div>
+
+                    <!-- Image Encoder -->
+                    <div style="width: 105px; height: 85px; background: var(--primary-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                        <p style="font-weight: bold; color: white; font-size: 0.85rem; margin: 0; line-height: 1.3;">Image<br>Encoder</p>
                     </div>
-                    <div style="font-size: 2rem;">&larr;</div>
-                    <div style="text-align: center;">
-                        <div style="width: 60px; height: 60px; background: #10b981; margin: 0 auto; border-radius: 50%;"></div>
-                        <p style="margin-top: 0.5rem;">Text</p>
+
+                    <!-- Arrow -->
+                    <div style="font-size: 2rem; color: var(--accent-color); display: flex; align-items: center;">→</div>
+
+                    <!-- Shared Space -->
+                    <div style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); min-width: 130px; height: 85px; display: flex; align-items: center; justify-content: center;">
+                        <div style="font-size: 0.95rem; font-weight: bold; color: white; margin: 0; line-height: 1.3;">Shared<br>Space</div>
                     </div>
+
+                    <!-- Arrow -->
+                    <div style="font-size: 2rem; color: var(--accent-color); display: flex; align-items: center;">←</div>
+
+                    <!-- Text Encoder -->
+                    <div style="width: 105px; height: 85px; background: var(--secondary-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                        <p style="font-weight: bold; color: white; font-size: 0.85rem; margin: 0; line-height: 1.3;">Text<br>Encoder</p>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div style="font-size: 2rem; color: var(--accent-color); display: flex; align-items: center;">←</div>
+
+                    <!-- Text -->
+                    <div style="width: 85px; height: 85px; background: var(--card-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 2px solid var(--border-color);">
+                        <div style="color: var(--text-color); font-size: 0.8rem; font-weight: 500; line-height: 1.3; text-align: center;">"A cute<br>puppy"</div>
+                    </div>
+
                 </div>
             </div>
 

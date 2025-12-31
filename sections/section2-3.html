@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2.3 The Math of Loss - CLIP Methodology</title>
+    <title>2.3 Loss Function - CLIP Methodology</title>
     <link rel="stylesheet" href="../assets/styles/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -33,7 +33,7 @@
     </header>
 
     <main>
-        <h1>2. Methodology: Deep Dive</h1>
+        <h1>2. Methodology </h1>
         
         <div class="chapter-nav">
             <a href="section2-1.html">2.1 Two-Stream Architecture</a>
@@ -42,22 +42,24 @@
         </div>
 
         <section class="content-section">
-            <h2>2.3 The Mathematical Framework</h2>
+            <h2>2.3 The Loss Function</h2>
             <p>
                 How do we turn the "Matching Game" into a differentiable loss function? We use a variant of the <span class="term-highlight">InfoNCE Loss<span class="term-tooltip">Noise Contrastive Estimation. A loss function used to learn representations by maximizing mutual information between related signals.</span></span>.
             </p>
 
-            <h3>Step 1: Cosine Similarity & Logits</h3>
+            <h3>Step 1: Logits</h3>
             <p>
-                First, we compute the similarity between every image $I_i$ and text $T_j$. Since our vectors are normalized (length 1), Cosine Similarity is simply the dot product:
-                $$ \text{sim}(I_i, T_j) = I_i \cdot T_j^T $$
+                First, we compute the similarity between every image $I_e$ and text $T_e$. Since our vectors are normalized (length 1), Cosine Similarity is simply the dot product:
+                $$ \text{sim}(I_e, T_e) = I_e \cdot T_e^T $$
             </p>
             <p>
-                However, raw dot products can be small. To help the Softmax function work effectively, we scale these values by a learned temperature parameter $\tau$ (tau).
-                $$ \text{logits}_{i,j} = (I_i \cdot T_j^T) \cdot \exp(\tau) $$
+                However, raw dot products can be small. To help the Softmax function work effectively, we scale these values by a learned temperature parameter $\tau$.
+                $$ \text{logits}_{i,j} = (I_e \cdot T_e^T) \cdot \exp(\tau) $$
             </p>
-            <p style="font-size: 0.9rem; color: #94a3b8;">
-                <em>Note: $\tau$ acts as a "confidence" knob. If $\tau$ is high, the distribution becomes sharp (peaked). CLIP learns this parameter automatically.</em>
+            <p style="font-size: 0.9rem; color: #94a3b8; text-align: center;">
+                <em>$\tau$ acts as a "confidence" knob. 
+                    <br>If $\tau$ is high, the distribution becomes sharp (peaked). 
+                    <br>CLIP learns this parameter automatically.</em>
             </p>
 
             <h3>Step 2: Symmetric Loss Calculation</h3>
@@ -98,7 +100,256 @@
                 $$ L_{Total} = \frac{1}{2} (L_{I \to T} + L_{T \to I}) $$
             </div>
 
-            <h3>Summary of the Algorithm</h3>
+            <h3 style="color: var(--secondary-color); margin-top: 3rem;">Geometric Perspective: Embeddings on a Hypersphere</h3>
+            <p>
+                From a geometric perspective, all embeddings are constrained to lie on the surface of a <strong>hypersphere</strong> (due to L2 normalization).
+                The loss function forces the paired vectors $I_k$ and $T_k$ to move closer together on the sphere.
+                Simultaneously, it forces $I_k$ to move away from all other text vectors in the batch.
+            </p>
+            <p>
+                In this way, the loss function shapes the shared embedding space into one where <strong>semantic correspondence is reflected directly by proximity</strong>.
+            </p>
+
+            <div style="background: #ffffff; padding: 1rem 1.5rem; border-radius: 10px; margin: 2rem 0; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="text-align: center; color: var(--secondary-color); margin-bottom: 1rem;">Interactive Hypersphere Visualization</h4>
+                <canvas id="hypersphereCanvas" width="350" height="350" style="display: block; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; max-width: 100%;"></canvas>
+
+                <div style="margin: 1rem auto; max-width: 500px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label for="trainingProgress" style="font-weight: 600; color: var(--text-color); font-size: 0.95rem;">Training Progress:</label>
+                        <span id="progressValue" style="color: var(--primary-color); font-weight: bold; font-size: 0.95rem;">0%</span>
+                    </div>
+                    <input type="range" id="trainingProgress" min="0" max="100" value="0"
+                           style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, #e2e8f0 0%, var(--primary-color) 0%); outline: none; -webkit-appearance: none; appearance: none;">
+                    <style>
+                        #trainingProgress::-webkit-slider-thumb {
+                            -webkit-appearance: none;
+                            appearance: none;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background: var(--primary-color);
+                            cursor: pointer;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                        }
+                        #trainingProgress::-moz-range-thumb {
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background: var(--primary-color);
+                            cursor: pointer;
+                            border: none;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                        }
+                    </style>
+                </div>
+
+                <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 50%;"></div>
+                        <span style="font-size: 0.9rem;">Image Embedding ($I_k$)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 16px; height: 16px; background: #10b981; border-radius: 50%;"></div>
+                        <span style="font-size: 0.9rem;">Matched Text ($T_k$) - Attracts</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 16px; height: 16px; background: #ef4444; border-radius: 50%;"></div>
+                        <span style="font-size: 0.9rem;">Other Texts - Repels</span>
+                    </div>
+                </div>
+
+                <p style="text-align: center; font-size: 0.85rem; color: #64748b; margin-top: 1rem; font-style: italic;">
+                    Drag the slider to see how embeddings move on the sphere surface during training. Matched pairs attract, while mismatched pairs repel.
+                </p>
+            </div>
+
+            <script>
+                const canvas = document.getElementById('hypersphereCanvas');
+                const ctx = canvas.getContext('2d');
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = 150;
+                const slider = document.getElementById('trainingProgress');
+                const progressValue = document.getElementById('progressValue');
+
+                // Initial positions (before training)
+                const imageAngle = Math.PI / 4;
+                const initialMatchedTextAngle = Math.PI * 2 / 3; // Start farther from image (120 degrees)
+                const initialNegText1Angle = Math.PI / 2; // Start closer to image (90 degrees)
+                const initialNegText2Angle = Math.PI; // Start at 180 degrees
+                const initialNegText3Angle = Math.PI * 3 / 2; // Start at 270 degrees
+
+                // Final positions (after training)
+                const finalMatchedTextAngle = imageAngle; // Same as image (converged)
+                const finalNegText1Angle = imageAngle + Math.PI; // Opposite side (225 degrees)
+                const finalNegText2Angle = imageAngle + Math.PI * 0.9; // Slightly different angle
+                const finalNegText3Angle = imageAngle + Math.PI * 1.1; // Slightly different angle
+
+                function lerp(start, end, t) {
+                    return start + (end - start) * t;
+                }
+
+                function drawSphere(progress) {
+                    // Clear canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw sphere outline
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#cbd5e1';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Draw grid lines for 3D effect
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (Math.PI / 4) * i;
+                        const x1 = centerX + radius * Math.cos(angle);
+                        const y1 = centerY + radius * Math.sin(angle);
+                        const x2 = centerX - radius * Math.cos(angle);
+                        const y2 = centerY - radius * Math.sin(angle);
+
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.strokeStyle = '#f1f5f9';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+
+                    // Calculate current angles based on progress (0 to 1)
+                    const matchedTextAngle = lerp(initialMatchedTextAngle, finalMatchedTextAngle, progress);
+                    const negText1Angle = lerp(initialNegText1Angle, finalNegText1Angle, progress);
+                    const negText2Angle = lerp(initialNegText2Angle, finalNegText2Angle, progress);
+                    const negText3Angle = lerp(initialNegText3Angle, finalNegText3Angle, progress);
+
+                    // Calculate positions on sphere
+                    const imgX = centerX + radius * Math.cos(imageAngle);
+                    const imgY = centerY + radius * Math.sin(imageAngle);
+
+                    const matchX = centerX + radius * Math.cos(matchedTextAngle);
+                    const matchY = centerY + radius * Math.sin(matchedTextAngle);
+
+                    const neg1X = centerX + radius * Math.cos(negText1Angle);
+                    const neg1Y = centerY + radius * Math.sin(negText1Angle);
+
+                    const neg2X = centerX + radius * Math.cos(negText2Angle);
+                    const neg2Y = centerY + radius * Math.sin(negText2Angle);
+
+                    const neg3X = centerX + radius * Math.cos(negText3Angle);
+                    const neg3Y = centerY + radius * Math.sin(negText3Angle);
+
+                    // Draw connection line between matched pairs
+                    ctx.beginPath();
+                    ctx.moveTo(imgX, imgY);
+                    ctx.lineTo(matchX, matchY);
+                    const attractOpacity = 0.3 + (1 - progress) * 0.4;
+                    ctx.strokeStyle = `rgba(16, 185, 129, ${attractOpacity})`;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Draw repulsion lines
+                    const repelOpacity = 0.2 + progress * 0.3;
+                    ctx.strokeStyle = `rgba(239, 68, 68, ${repelOpacity})`;
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([3, 3]);
+
+                    ctx.beginPath();
+                    ctx.moveTo(imgX, imgY);
+                    ctx.lineTo(neg1X, neg1Y);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(imgX, imgY);
+                    ctx.lineTo(neg2X, neg2Y);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(imgX, imgY);
+                    ctx.lineTo(neg3X, neg3Y);
+                    ctx.stroke();
+
+                    ctx.setLineDash([]);
+
+                    // Draw embeddings as circles
+                    // Image embedding (blue)
+                    ctx.beginPath();
+                    ctx.arc(imgX, imgY, 12, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.fill();
+                    ctx.strokeStyle = '#1e40af';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Matched text (green)
+                    ctx.beginPath();
+                    ctx.arc(matchX, matchY, 12, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#10b981';
+                    ctx.fill();
+                    ctx.strokeStyle = '#059669';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Negative text 1 (red)
+                    ctx.beginPath();
+                    ctx.arc(neg1X, neg1Y, 10, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fill();
+                    ctx.strokeStyle = '#dc2626';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Negative text 2 (red)
+                    ctx.beginPath();
+                    ctx.arc(neg2X, neg2Y, 10, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fill();
+                    ctx.strokeStyle = '#dc2626';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Negative text 3 (red)
+                    ctx.beginPath();
+                    ctx.arc(neg3X, neg3Y, 10, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fill();
+                    ctx.strokeStyle = '#dc2626';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Add labels
+                    ctx.font = 'bold 14px Inter';
+                    ctx.fillStyle = '#1e40af';
+                    ctx.fillText('Ik', imgX - 8, imgY - 18);
+
+                    ctx.fillStyle = '#059669';
+                    ctx.fillText('Tk', matchX - 8, matchY - 18);
+
+                    ctx.fillStyle = '#dc2626';
+                    ctx.font = '12px Inter';
+                    ctx.fillText('T-', neg1X - 8, neg1Y - 15);
+                    ctx.fillText('T-', neg2X - 8, neg2Y - 15);
+                    ctx.fillText('T-', neg3X - 8, neg3Y - 15);
+                }
+
+                // Update visualization when slider changes
+                slider.addEventListener('input', function() {
+                    const progress = this.value / 100;
+                    progressValue.textContent = this.value + '%';
+
+                    // Update slider background
+                    this.style.background = `linear-gradient(to right, var(--primary-color) 0%, var(--primary-color) ${this.value}%, #e2e8f0 ${this.value}%, #e2e8f0 100%)`;
+
+                    drawSphere(progress);
+                });
+
+                // Initial draw
+                drawSphere(0);
+            </script>
+
+            <!-- <h3>Summary of the Algorithm</h3>
             <pre style="background: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #334155; font-size: 0.85rem; border: 1px solid #e2e8f0;">
 # Pseudocode (Numpy-style)
 I_f = image_encoder(images)        # [n, d_i]
@@ -113,10 +364,10 @@ logits = (I_e @ T_e.T) * np.exp(t) # [n, n]
 
 # Symmetric Loss
 labels = np.arange(n)              # [0, 1, 2, ... n-1]
-loss_i = cross_entropy(logits, labels, axis=0)
-loss_t = cross_entropy(logits, labels, axis=1)
+loss_i = cross_entropy(logits, labels, axis=1)  # Image-to-Text: softmax over rows
+loss_t = cross_entropy(logits, labels, axis=0)  # Text-to-Image: softmax over columns
 loss = (loss_i + loss_t) / 2
-            </pre>
+            </pre> -->
         </section>
 
         <div class="page-nav">

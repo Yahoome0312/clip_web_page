@@ -1,6 +1,7 @@
 :root {
     --primary-color: #3b82f6;      /* Blue remains similar */
     --secondary-color: #10b981;    /* Green remains similar */
+    --third-color: #f97316;        /* Orange */
     --bg-color: #f8fafc;           /* Light/Off-white background */
     --text-color: #1e293b;         /* Dark slate for text */
     --heading-color: #0f172a;      /* Almost black for headings */

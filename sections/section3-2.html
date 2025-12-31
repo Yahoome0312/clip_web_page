@@ -101,7 +101,7 @@
     </header>
 
     <main>
-        <h1>3. Applications: Retrieval</h1>
+        <h1>3. Applications</h1>
         
         <div class="chapter-nav">
             <a href="section3-1.html">3.1 Zero-Shot Classification</a>
@@ -112,11 +112,11 @@
         <section class="content-section">
             <h2>3.2 Semantic Image Retrieval</h2>
             <p>
-                In traditional search, searching for "vehicle" might fail if images are only tagged "car" or "truck".
-                CLIP searches by <strong>meaning</strong>.
+                Retrieval is a natural extension of the shared embedding space and comes in two forms: text-to-image and image-to-text.
             </p>
             <p>
-                Since text and images live in the same embedding space, we can simply convert your search query into a vector and find the closest image vectors.
+                In text-to-image retrieval: the user provides a textual query, such as “a red car parked on a street.” The text is encoded into an embedding and compared with a gallery of image embeddings. Images whose embeddings are closest to the query are returned as matches.
+                <br>In image-to-text retrieval: the roles are reversed: given an image, the model retrieves the most semantically relevant text descriptions. This can be used for automatic tagging, dataset exploration, or generating human-readable captions for large image collections.
             </p>
 
             <h3>Live Demo</h3>
@@ -186,6 +186,14 @@
                     }
                 }
             </script>
+
+            <h3 style="color: var(--secondary-color); margin-top: 3rem;">Beyond Keyword Matching</h3>
+            <p>
+                Unlike keyword-based search, CLIP retrieval relies on <strong>semantic similarity</strong> rather than exact word overlap. A query like <em>"a vehicle used for commuting"</em> may retrieve images of cars or buses, even if the words "car" or "bus" do not appear in the dataset captions.
+            </p>
+            <p>
+                This makes retrieval robust to paraphrases, synonyms, and abstract descriptions, enabling flexible exploration of unstructured or poorly labeled datasets.
+            </p>
         </section>
 
         <div class="page-nav">
