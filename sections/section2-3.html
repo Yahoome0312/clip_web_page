@@ -49,12 +49,12 @@
 
             <h3>Step 1: Logits</h3>
             <p>
-                First, we compute the similarity between every image $I_e$ and text $T_e$. Since our vectors are normalized (length 1), Cosine Similarity is simply the dot product:
-                $$ \text{sim}(I_e, T_e) = I_e \cdot T_e^T $$
+                First, we compute the similarity between every image $I_i$ and text $T_j$. Since our vectors are normalized (length 1), Cosine Similarity is simply the dot product:
+                $$ \text{sim}(I_i, T_j) = I_i \cdot T_j $$
             </p>
             <p>
                 However, raw dot products can be small. To help the Softmax function work effectively, we scale these values by a learned temperature parameter $\tau$.
-                $$ \text{logits}_{i,j} = (I_e \cdot T_e^T) \cdot \exp(\tau) $$
+                $$ \text{logits}_{i,j} = (I_i \cdot T_j) \cdot \exp(\tau) $$
             </p>
             <p style="font-size: 0.9rem; color: #94a3b8; text-align: center;">
                 <em>$\tau$ acts as a "confidence" knob. 
@@ -353,14 +353,14 @@
             <pre style="background: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #334155; font-size: 0.85rem; border: 1px solid #e2e8f0;">
 # Pseudocode (Numpy-style)
 I_f = image_encoder(images)        # [n, d_i]
-T_f = text_encoder(texts)          # [n, d_t]
+T_f = texT_jncoder(texts)          # [n, d_t]
 
 # Projection & Normalization
-I_e = l2_normalize(I_f @ W_i)      # [n, d]
-T_e = l2_normalize(T_f @ W_t)      # [n, d]
+I_i = l2_normalize(I_f @ W_i)      # [n, d]
+T_j = l2_normalize(T_f @ W_t)      # [n, d]
 
 # Logits
-logits = (I_e @ T_e.T) * np.exp(t) # [n, n]
+logits = (I_i @ T_j.T) * np.exp(t) # [n, n]
 
 # Symmetric Loss
 labels = np.arange(n)              # [0, 1, 2, ... n-1]
